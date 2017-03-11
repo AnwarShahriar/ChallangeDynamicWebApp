@@ -32,9 +32,16 @@ module.exports = function (app, passport) {
 			req.logout();
 			res.redirect('/login');
 		});
+	
+	function redirectToCreatePoll(req, res, next) {
 		
+	}
+	
 	app.route('/createpoll')
-		.get(isLoggedIn, function (req, res) {
+		.get(function(req, res, next) {
+			req.session.redirectTo = '/createpoll';
+			next();	
+		}, isLoggedIn, function (req, res) {
 			res.sendFile(path + '/public/createpoll.html');	
 		})
 
@@ -57,10 +64,12 @@ module.exports = function (app, passport) {
 		.get(passport.authenticate('twitter'));
 
 	app.route('/auth/twitter/callback')
-		.get(passport.authenticate('twitter', {
-			successRedirect: '/',
-			failureRedirect: '/login'
-		}));
+		.get(function(req, res, next) {
+			passport.authenticate('twitter', {
+				successRedirect: req.session.redirectTo ? req.session.redirectTo : '/',
+				failureRedirect: '/login'
+			})(req, res, next);
+		});
 
 	app.route('/api/:id/clicks')
 		.get(isLoggedIn, clickHandler.getClicks)

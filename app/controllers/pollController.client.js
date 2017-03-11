@@ -16,8 +16,12 @@
    }, true);
    
    createPollButton.addEventListener('click', function () {
-
-      ajaxFunctions.ajaxRequest('POST', apiUrl, update);
+      var title = document.querySelector('#pollTitle').value;
+      var options = document.querySelector('#pollOptions').value.split('\n');
+      ajaxFunctions.ajaxRequest('POST', apiUrl, update, {
+         title: title,
+         options: options
+      });
 
    }, false);
 

@@ -1,34 +1,23 @@
 'use strict';
 
 var Users = require('../models/users.js');
+var _ = require('lodash');
 
 function PollHandler () {
 
 	this.newPoll = function (req, res) {
-	    console.log('inside new poll');
+		
+	    var title = req.body.title;
+	    var options = _.map(req.body.options, (option) => { 
+	    		return { name: option, voteCount: 0 };
+	    	});
+	    var poll = { title: title, options: options };
+	    
 		Users
 			.findOne({ 'twitter.id': req.user.twitter.id })
 			.exec(function (err, user) {
 					
 					if (err) { throw err; }
-                    
-                    var poll = {
-                        title: "Surprise",
-                        options: [
-                            {
-                                name: "Option1",
-                                voteCount: 100
-                            },
-                            {
-                                name: "Option2",
-                                voteCount: 100
-                            },
-                            {
-                                name: "Option3",
-                                voteCount: 100
-                            }
-                        ]
-                    };
                     
                     var newPoll = user.polls.create(poll);
                     
