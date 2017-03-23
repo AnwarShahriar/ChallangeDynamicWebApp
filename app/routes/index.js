@@ -51,7 +51,7 @@ module.exports = function (app, passport) {
 		});
 		
 	app.route('/polldetail/:id')
-		.get(isLoggedIn, function(req, res) {
+		.get(function(req, res) {
 			res.sendFile(path + '/public/poll.html'); 
 		});
 
@@ -80,6 +80,12 @@ module.exports = function (app, passport) {
 		.post(isLoggedIn, pollHandler.newPoll);
 		
 	app.route('/api/polls/:id')
-		.get(isLoggedIn, pollHandler.getPoll);
+		.get(function(req, res) {
+			if (req.isAuthenticated()) {
+				return pollHandler.authenticatedPollById(req, res);
+			} else {
+				return pollHandler.pollById(req, res);
+			}
+		});
 	
 };

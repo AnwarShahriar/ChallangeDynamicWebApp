@@ -52,7 +52,39 @@ function PollHandler () {
 	           res.json(match);
 	        });
 	};
-
+	
+	this.pollById = function (req, res) {
+		findPoll(req.params.id, function (poll) {
+			res.json({
+				poll: poll,
+				canedit: false
+			});
+		});
+	};
+	
+	this.authenticatedPollById = function (req, res) {
+		findPoll(req.params.id, function (poll) {
+			res.json({
+				poll: poll,
+				canedit: true
+			});
+		});
+	};
+	
+	var findPoll = function (pollId, callback) {
+		Users
+			.findOne({'polls._id': pollId})
+			.exec(function (err, user) {
+				if (err) throw err;
+				
+				for (var i = 0; i < user.polls.length; i++) {
+	        	   var poll = user.polls[i];
+	               if (pollId === poll._id.toString()) {
+	                   return callback(user.polls[i]);
+	               }
+	        	}
+			});
+	};
 }
 
 module.exports = PollHandler;
